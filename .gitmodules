@@ -1,0 +1,4 @@
+[submodule "tools/steslide"]
+	path = tools/steslide
+	url = https://github.com/scpark20/SteSlide.git
+	branch = main

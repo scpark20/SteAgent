@@ -1,0 +1,12 @@
+{
+  "markdown.marp.themes": [
+    "./tools/steslide/theme.css"
+  ],
+  "remote.portsAttributes": {
+    "8766": {
+      "label": "SteAgent · SteSlide",
+      "onAutoForward": "openBrowser",
+      "requireLocalPort": true
+    }
+  }
+}
