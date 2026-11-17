@@ -1,7 +1,9 @@
-# 작업 규칙
+# Working on SteAgent
 
-- 강의 원본은 `lectures/`에 둡니다. 사용자가 지시한 내용만 넣고 예시 강의나 목차를 임의로 채우지 않습니다.
-- 슬라이드 공통 도구는 `tools/steslide` Git 서브모듈입니다. 생성기·공통 테마·설치 도구는 그 안에서 수정하고 SteSlide 저장소에 반영합니다. SteAgent에 별도 구현을 만들지 않습니다.
-- 슬라이드 원본은 `intro.md`, `section-*.md`입니다. `lecture.md`, `chapter.md`, `.build/`는 자동 생성 파일입니다.
-- 공통 도구 업데이트를 반영할 때 SteSlide 변경을 먼저 커밋·푸시한 뒤 SteAgent의 서브모듈 버전을 커밋합니다. 관련 없는 미커밋 변경은 보존합니다.
-- 실행 방법과 업데이트 절차는 `lectures/README.md`, `tools/steslide/README.md`를 참고합니다.
+- Store lecture sources in `lectures/`. Add only content requested by the user; do not invent lesson material.
+- Write all published documentation, comments, CLI help, prompts, and other repository text in English.
+- The course follows LLM → Ollama → LangGraph. Each chapter starts with Hello World!!! and evolves the previous implementation through small, explicit changes. The current design lives in `docs/curriculum.md`.
+- Shared slide tooling lives in the `tools/steslide` Git submodule. Make generator, shared theme, and installer changes there and publish them to SteSlide. Do not create a separate implementation in SteAgent.
+- Edit `intro.md` and `section-*.md`. Treat `lecture.md`, `chapter.md`, and `.build/` as generated output.
+- Publish shared tool changes to SteSlide first, then commit the updated submodule version in SteAgent. Preserve unrelated uncommitted changes.
+- See `docs/slides.md` and `tools/steslide/docs/maintenance.md` for preview and update procedures.

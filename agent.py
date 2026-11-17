@@ -30,9 +30,9 @@ def build_graph(model: str, base_url: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="로컬 LLM으로 실행하는 LangGraph Hello World")
+    parser = argparse.ArgumentParser(description="LangGraph hello world using a local Ollama model")
     parser.add_argument(
-        "prompt", nargs="?", default="Hello, world!라고 인사하고 한 문장으로 자기소개해 줘."
+        "prompt", nargs="?", default="Say Hello, world! and introduce yourself in one sentence."
     )
     parser.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "qwen3:4b-instruct"))
     parser.add_argument(
@@ -40,13 +40,13 @@ def main():
     )
     args = parser.parse_args()
     if not args.prompt.strip():
-        parser.error("질문을 입력해 주세요.")
+        parser.error("Please enter a non-empty prompt.")
 
     graph = build_graph(args.model, args.base_url)
     result = graph.invoke(
         {
             "messages": [
-                ("system", "너는 SteAgent라는 AI 도우미다. 사용자의 언어로 짧고 명확하게 답해라."),
+                ("system", "You are SteAgent, an AI assistant. Reply briefly and clearly in the user's language."),
                 ("user", args.prompt),
             ]
         }
