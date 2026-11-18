@@ -1,50 +1,37 @@
 # Architecture
 
-[← SteAgent](../README.md) · [Usage guide](usage.md) · [Slides](slides.md)
+[← SteAgent](../README.md) · [Usage guide](usage.md) · [Course outline](curriculum.md)
 
-## One request
+## Final control flow
 
 ```mermaid
-sequenceDiagram
-    participant U as User / CLI
-    participant G as LangGraph
-    participant L as ChatOllama
-    participant O as Ollama / Qwen
-    U->>G: System message + user prompt
-    G->>L: assistant(state)
-    L->>O: Chat request
-    O-->>L: Model response
-    L-->>G: Append AIMessage to state
-    G-->>U: Print the final message
+flowchart LR
+    A([START]) --> B[assistant]
+    B -->|tool_calls| C[tools]
+    C -->|tool observations| B
+    B -->|final answer| D([END])
 ```
 
-`build_graph()` in `agent.py` creates a `StateGraph` with `MessagesState`. Its path is `START → assistant → END`; `assistant` calls `ChatOllama.invoke()` once. `main()` reads CLI arguments, constructs the messages, invokes the graph, and prints the response.
+The root entry point executes `code/chapter-08/agent.py`. Earlier chapter files are runnable checkpoints of the same implementation, allowing direct source comparisons.
 
-The current implementation has no tool calls, planning loop, or persistent conversation memory. Each process invocation handles an independent question. The [course outline](curriculum.md) describes planned incremental steps beyond this hello-world baseline.
+`call_model()` sends role/content messages and tool definitions to Ollama with Python's HTTP standard library. No LangChain model wrapper is required. `StateGraph` only manages execution and state.
 
-## Model settings
+## State and nodes
 
-The `ChatOllama` constructor in `agent.py` currently sets:
+State contains `messages` and the number of model `calls` in the current turn. Each node returns the complete updated message list, so the graph uses replacement semantics rather than an append reducer.
 
-| Option | Value | Purpose |
-| --- | --- | --- |
-| `temperature` | `0` | Reduce sampling randomness. |
-| `reasoning` | `False` | Request non-thinking behavior when supported by the model. |
-| `num_ctx` | `4096` | Configure the context size. |
-| `num_predict` | `256` | Limit generated tokens. |
-| `client_kwargs.timeout` | `120.0` | Configure the HTTP client timeout. |
-| `validate_model_on_init` | `True` | Check model availability during initialization. |
+The assistant node adds the model response. A conditional edge checks for `tool_calls`. The tools node dispatches registered functions and appends their observations. The next assistant call receives the request and result together.
 
-Reasoning support depends on the model. Setting `reasoning=True` cannot add a thinking mode to a model that does not support one.
+The CLI keeps the returned state for `--chat`, appends the next user message, and resets the per-turn call counter.
 
-## Files
+## Tools and errors
 
-| File | Responsibility |
-| --- | --- |
-| `agent.py` | Graph definition and CLI entry point |
-| `pyproject.toml`, `uv.lock` | Dependency declarations and pinned versions |
-| `lectures/` | Lecture Markdown sources |
-| `tools/steslide/` | Shared slide tooling as a Git submodule |
-| `steslide.json` | Project slide settings |
+The registry contains one tool, `add(a, b)`. Its JSON schema is sent to the model, but the Python function independently validates actual values. It rejects non-numeric values, booleans, non-finite inputs, and non-finite results.
 
-Official references: [LangGraph](https://docs.langchain.com/oss/python/langgraph/overview), [ChatOllama](https://docs.langchain.com/oss/python/integrations/chat/ollama).
+Unknown tools, invalid arguments, and ordinary execution exceptions become JSON error observations. The dispatcher invokes only registered callables; it does not evaluate generated Python.
+
+## Termination
+
+A model response without tool calls ends the graph. If another action is requested after the allowed model-call count, execution stops before dispatching it. A final answer on the last allowed call is accepted. The CLI also sets a graph recursion limit and a 120-second HTTP timeout.
+
+This is a minimal local agent: one tool, in-process message history, and bounded execution. It has no persistent memory, external application actions, or autonomous background tasks.

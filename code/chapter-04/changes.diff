@@ -1,0 +1,36 @@
+--- chapter-03/agent.py
++++ chapter-04/agent.py
+@@ -1,4 +1,4 @@
+-"""Chapter 03: wrap the existing model call in a single graph node."""
++"""Chapter 04: keep message state between conversation turns."""
+ 
+ import argparse
+ import json
+@@ -44,11 +44,24 @@
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
++    parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
+     args = parser.parse_args()
+-    messages = [{"role": "user", "content": args.prompt}]
+     graph = build_graph()
+-    state = graph.invoke({"messages": messages})
+-    print(state["messages"][-1]["content"])
++    messages = []
++    prompt = args.prompt
++    while True:
++        messages.append({"role": "user", "content": prompt})
++        state = graph.invoke({"messages": messages})
++        messages = state["messages"]
++        print(messages[-1]["content"])
++        if not args.chat:
++            break
++        try:
++            prompt = input("You (empty to exit): ").strip()
++        except (EOFError, KeyboardInterrupt):
++            break
++        if not prompt:
++            break
+ 
+ 
+ if __name__ == "__main__":

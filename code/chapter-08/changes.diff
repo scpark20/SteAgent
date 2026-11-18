@@ -1,0 +1,119 @@
+--- chapter-07/agent.py
++++ chapter-08/agent.py
+@@ -1,7 +1,9 @@
+-"""Chapter 07: feed tool results back to the model."""
++"""Chapter 08: a bounded tool-using agent with validated inputs."""
+ 
+ import argparse
+ import json
++import math
++import sys
+ import os
+ import urllib.request
+ from typing import TypedDict
+@@ -29,10 +31,17 @@
+ 
+ class State(TypedDict):
+     messages: list[dict]
++    calls: int
+ 
+ 
+ def add(a: float, b: float) -> float:
+-    return a + b
++    for value in (a, b):
++        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
++            raise ValueError("Arguments must be finite numbers")
++    result = a + b
++    if not math.isfinite(result):
++        raise ValueError("The result must be finite")
++    return result
+ 
+ 
+ TOOLS = [{
+@@ -52,23 +61,39 @@
+ 
+ 
+ def execute_tool(call):
+-    function = call["function"]
+-    name = function["name"]
+-    result = REGISTRY[name](**function["arguments"])
+-    return {"role": "tool", "tool_name": name, "content": json.dumps({"result": result})}
++    name = "unknown"
++    try:
++        function = call["function"]
++        name = function["name"]
++        if name not in REGISTRY:
++            raise ValueError(f"Unknown tool: {name}")
++        arguments = function["arguments"]
++        if not isinstance(arguments, dict):
++            raise ValueError("Tool arguments must be an object")
++        content = {"result": REGISTRY[name](**arguments)}
++    except Exception as error:
++        content = {"error": str(error)}
++    return {"role": "tool", "tool_name": str(name), "content": json.dumps(content, allow_nan=False)}
+ 
+ 
+-def build_graph():
++def build_graph(max_steps=8):
++    if max_steps < 1:
++        raise ValueError("max_steps must be positive")
++
+     def assistant(state):
+         reply = call_model(state["messages"], TOOLS)
+-        return {"messages": state["messages"] + [reply]}
++        return {"messages": state["messages"] + [reply], "calls": state.get("calls", 0) + 1}
+ 
+     def tool_node(state):
+         results = [execute_tool(call) for call in state["messages"][-1].get("tool_calls", [])]
+         return {"messages": state["messages"] + results}
+ 
+     def route(state):
+-        return "tools" if state["messages"][-1].get("tool_calls") else END
++        if not state["messages"][-1].get("tool_calls"):
++            return END
++        if state["calls"] >= max_steps:
++            raise RuntimeError("Step limit reached before a final answer")
++        return "tools"
+ 
+     builder = StateGraph(State)
+     builder.add_node("assistant", assistant)
+@@ -83,19 +108,31 @@
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+     parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
+-    parser.add_argument("--tool-demo", action="store_true", help="Execute add(2, 3) directly")
++    parser.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "qwen3:4b-instruct"))
++    parser.add_argument("--base-url", default=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"))
++    parser.add_argument("--max-steps", type=int, default=8)
++    parser.add_argument("--trace", action="store_true", help="Print tool results to stderr")
+     args = parser.parse_args()
+-    if args.tool_demo:
+-        call = {"function": {"name": "add", "arguments": {"a": 2, "b": 3}}}
+-        print(execute_tool(call)["content"])
+-        return
+-    graph = build_graph()
+-    messages = []
++    if args.max_steps < 1 or not args.prompt.strip():
++        parser.error("Use a non-empty prompt and a positive max-steps value")
++    os.environ["OLLAMA_MODEL"] = args.model
++    os.environ["OLLAMA_BASE_URL"] = args.base_url
++    graph = build_graph(args.max_steps)
++    messages = [{"role": "system", "content": "Reply briefly. Use add for addition. Never invent tool results."}]
+     prompt = args.prompt
+     while True:
+         messages.append({"role": "user", "content": prompt})
+-        state = graph.invoke({"messages": messages})
++        before = len(messages)
++        try:
++            state = graph.invoke({"messages": messages, "calls": 0},
++                                 {"recursion_limit": 2 * args.max_steps + 4})
++        except (RuntimeError, OSError, ValueError) as error:
++            parser.exit(1, f"Agent stopped: {error}\n")
+         messages = state["messages"]
++        if args.trace:
++            for message in messages[before:]:
++                if message["role"] == "tool":
++                    print(f"[tool:{message['tool_name']}] {message['content']}", file=sys.stderr)
+         print(messages[-1]["content"])
+         if not args.chat:
+             break

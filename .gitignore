@@ -16,6 +16,6 @@ __pycache__/
 Thumbs.db
 
 # SteSlide generated files
-/lectures/.build/
-/lectures/lecture-*/lecture.md
-/lectures/lecture-*/chapter-*/chapter.md
+/lecture/.build/
+/lecture/lecture.md
+/lecture/chapter-*/chapter.md

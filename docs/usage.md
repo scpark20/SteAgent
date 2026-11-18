@@ -1,10 +1,8 @@
 # Usage guide
 
-[← SteAgent](../README.md) · [Architecture](architecture.md) · [Slides](slides.md)
+[← SteAgent](../README.md) · [Course outline](curriculum.md) · [Slides](slides.md)
 
-## Install and run
-
-Install Python 3.11+, [uv](https://docs.astral.sh/uv/getting-started/installation/), and [Ollama](https://ollama.com/download).
+## Setup
 
 ```bash
 git clone --recurse-submodules https://github.com/scpark20/SteAgent.git
@@ -12,40 +10,66 @@ cd SteAgent
 uv sync --locked
 ```
 
-Start the Ollama application or service. If no service is running, run `ollama serve` in a separate terminal. Then download the model and run the agent:
+Requires Python 3.11+ and uv. Chapters 02–08 need a running Ollama service and the model:
 
 ```bash
 ollama pull qwen3:4b-instruct
-uv run agent.py
-uv run agent.py "What is 2 + 3?"
 ```
 
-Dependencies are pinned in `uv.lock`. `uv sync --locked` installs them into the project's `.venv`, and `uv run` selects that environment.
+If Ollama is not already running as an application or service, run `ollama serve` in another terminal.
 
-## Choose a model or server
+## Chapter 01: direct weights
 
 ```bash
-ollama list
-uv run agent.py --model qwen3:4b-instruct "Introduce yourself in one sentence."
-uv run agent.py --base-url http://localhost:11434 "Hello!"
+uv sync --locked --extra llm
+uv run --extra llm code/chapter-01/agent.py
 ```
 
-Use a model name installed in Ollama. The default model's official page is [Qwen3 4B Instruct](https://ollama.com/library/qwen3:4b-instruct).
+Set `LLM_MODEL` to a Hugging Face model ID or local directory:
 
-| Setting | CLI option | Environment variable | Default |
-| --- | --- | --- | --- |
-| Model | `--model` | `OLLAMA_MODEL` | `qwen3:4b-instruct` |
-| Ollama URL | `--base-url` | `OLLAMA_BASE_URL` | `http://localhost:11434` |
+```bash
+LLM_MODEL=/path/to/qwen-checkpoint uv run --extra llm code/chapter-01/agent.py
+```
 
-CLI options take precedence over environment variables. Omitting the prompt uses the default greeting request.
+The default is `Qwen/Qwen3-4B-Instruct-2507`. PyTorch, Transformers, and Accelerate are optional dependencies. The first run may download the selected model. A CUDA-capable PyTorch installation and sufficient GPU memory are recommended. FP8 checkpoints are dequantized on load, so allow memory for the expanded weights. The local Qwen3-8B-FP8 checkpoint has been verified on an RTX 5090.
 
-## Troubleshooting
+## Chapter checkpoints
 
-| Symptom | What to check |
-| --- | --- |
-| `No module named 'langchain_ollama'` | Run `uv sync --locked`, then use `uv run agent.py`. |
-| Ollama connection failure | Check that the application/service is running and `--base-url` is correct. |
-| Model not found | Check `ollama list` and download the model with `ollama pull`. |
-| Empty `tools/steslide` directory | Run `git submodule update --init --recursive`. |
+```bash
+uv run code/chapter-02/agent.py
+uv run code/chapter-03/agent.py
+uv run code/chapter-04/agent.py --chat
+uv run code/chapter-05/agent.py --tool-demo
+uv run code/chapter-06/agent.py "Use add to calculate 12 + 30."
+uv run code/chapter-07/agent.py "Use add to calculate 12 + 30."
+uv run code/chapter-08/agent.py "Use add to calculate 12 + 30." --trace
+```
 
-To run with plain `python`, activate `.venv` first or use `.venv/bin/python agent.py` on macOS/Linux. A standalone Safetensors checkpoint cannot be passed directly as an Ollama model name; it needs a supported import/conversion workflow or a separate inference integration.
+All scripts accept a positional prompt and default to a Hello World!!! request. Chapters 04–08 accept `--chat`. Chapter 05 demonstrates direct dispatch; Chapter 06 ends at the tool result; Chapter 07 returns that result to the model.
+
+Use `OLLAMA_MODEL` and `OLLAMA_BASE_URL` to configure Chapters 02–08. Defaults are `qwen3:4b-instruct` and `http://localhost:11434`.
+
+## Final agent
+
+```bash
+uv run agent.py
+uv run agent.py "Use add to calculate 12 + 30." --trace
+uv run agent.py --chat
+uv run agent.py --max-steps 4 --model qwen3:4b-instruct
+```
+
+`--base-url` selects the Ollama server. `--trace` prints actual tool observations to stderr. `--max-steps` limits model calls per user turn. Exhausting the budget produces an explicit error and a nonzero exit status. Tool failures are returned as observations so the model can respond or correct its request.
+
+Conversation history stays in memory until the process exits. It is not a database or long-term memory.
+
+## Verification
+
+```bash
+uv run python -m unittest discover -s tests -v
+```
+
+Tests cover greeting-only responses, tool results reaching the model, multiple tool rounds, bad arguments, unknown tools, runtime failures, and execution limits. They also check the behavioral change from Chapter 06 to Chapter 07.
+
+If Python cannot import a dependency, run through `uv run` instead of an unrelated system interpreter. If `tools/steslide` is empty, run `git submodule update --init --recursive`.
+
+References: [Qwen weights](https://huggingface.co/Qwen/Qwen3-8B-FP8), [Ollama tool calling](https://docs.ollama.com/capabilities/tool-calling), [Transformers FP8](https://huggingface.co/docs/transformers/quantization/finegrained_fp8).

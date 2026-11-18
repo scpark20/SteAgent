@@ -1,0 +1,55 @@
+--- chapter-04/agent.py
++++ chapter-05/agent.py
+@@ -1,4 +1,4 @@
+-"""Chapter 04: keep message state between conversation turns."""
++"""Chapter 05: define a tool and execute an explicit request."""
+ 
+ import argparse
+ import json
+@@ -29,6 +29,33 @@
+     messages: list[dict]
+ 
+ 
++def add(a: float, b: float) -> float:
++    return a + b
++
++
++TOOLS = [{
++    "type": "function",
++    "function": {
++        "name": "add",
++        "description": "Add two numbers. Use this tool for addition.",
++        "parameters": {
++            "type": "object",
++            "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
++            "required": ["a", "b"],
++            "additionalProperties": False,
++        },
++    },
++}]
++REGISTRY = {"add": add}
++
++
++def execute_tool(call):
++    function = call["function"]
++    name = function["name"]
++    result = REGISTRY[name](**function["arguments"])
++    return {"role": "tool", "tool_name": name, "content": json.dumps({"result": result})}
++
++
+ def build_graph():
+     def assistant(state):
+         reply = call_model(state["messages"])
+@@ -45,7 +72,12 @@
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+     parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
++    parser.add_argument("--tool-demo", action="store_true", help="Execute add(2, 3) directly")
+     args = parser.parse_args()
++    if args.tool_demo:
++        call = {"function": {"name": "add", "arguments": {"a": 2, "b": 3}}}
++        print(execute_tool(call)["content"])
++        return
+     graph = build_graph()
+     messages = []
+     prompt = args.prompt

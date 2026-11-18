@@ -1,0 +1,49 @@
+--- chapter-02/agent.py
++++ chapter-03/agent.py
+@@ -1,9 +1,12 @@
+-"""Chapter 02: replace direct inference with an Ollama HTTP request."""
++"""Chapter 03: wrap the existing model call in a single graph node."""
+ 
+ import argparse
+ import json
+ import os
+ import urllib.request
++from typing import TypedDict
++
++from langgraph.graph import END, START, StateGraph
+ 
+ 
+ def call_model(messages):
+@@ -22,13 +25,30 @@
+         return json.load(response)["message"]
+ 
+ 
++class State(TypedDict):
++    messages: list[dict]
++
++
++def build_graph():
++    def assistant(state):
++        reply = call_model(state["messages"])
++        return {"messages": state["messages"] + [reply]}
++
++    builder = StateGraph(State)
++    builder.add_node("assistant", assistant)
++    builder.add_edge(START, "assistant")
++    builder.add_edge("assistant", END)
++    return builder.compile()
++
++
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+     args = parser.parse_args()
+     messages = [{"role": "user", "content": args.prompt}]
+-    reply = call_model(messages)
+-    print(reply["content"])
++    graph = build_graph()
++    state = graph.invoke({"messages": messages})
++    print(state["messages"][-1]["content"])
+ 
+ 
+ if __name__ == "__main__":

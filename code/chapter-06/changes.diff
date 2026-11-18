@@ -1,0 +1,51 @@
+--- chapter-05/agent.py
++++ chapter-06/agent.py
+@@ -1,4 +1,4 @@
+-"""Chapter 05: define a tool and execute an explicit request."""
++"""Chapter 06: let the model request one tool execution."""
+ 
+ import argparse
+ import json
+@@ -9,7 +9,7 @@
+ from langgraph.graph import END, START, StateGraph
+ 
+ 
+-def call_model(messages):
++def call_model(messages, tools=None):
+     payload = {
+         "model": os.getenv("OLLAMA_MODEL", "qwen3:4b-instruct"),
+         "messages": messages,
+@@ -17,6 +17,8 @@
+         "think": False,
+         "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 256},
+     }
++    if tools:
++        payload["tools"] = tools
+     url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/") + "/api/chat"
+     request = urllib.request.Request(
+         url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"}
+@@ -58,13 +60,22 @@
+ 
+ def build_graph():
+     def assistant(state):
+-        reply = call_model(state["messages"])
++        reply = call_model(state["messages"], TOOLS)
+         return {"messages": state["messages"] + [reply]}
++
++    def tool_node(state):
++        results = [execute_tool(call) for call in state["messages"][-1].get("tool_calls", [])]
++        return {"messages": state["messages"] + results}
++
++    def route(state):
++        return "tools" if state["messages"][-1].get("tool_calls") else END
+ 
+     builder = StateGraph(State)
+     builder.add_node("assistant", assistant)
++    builder.add_node("tools", tool_node)
+     builder.add_edge(START, "assistant")
+-    builder.add_edge("assistant", END)
++    builder.add_conditional_edges("assistant", route, {"tools": "tools", END: END})
++    builder.add_edge("tools", END)
+     return builder.compile()
+ 
+ 

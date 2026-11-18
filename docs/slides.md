@@ -11,21 +11,28 @@ After cloning, run from the SteAgent root:
 ```bash
 git submodule update --init --recursive
 python3 tools/steslide/scripts/setup_marp.py
-bash lectures/preview.sh
+bash lecture/preview.sh
 ```
 
 Open <http://localhost:8766/lecture.md>. Saved source changes update the preview automatically. With Remote SSH, forward port `8766` in VS Code.
 
 ## Sources
 
-- `lecture-01/intro.md`: Lecture introduction
-- `lecture-01/chapter-01/intro.md`: LLM
-- `lecture-01/chapter-02/intro.md`: Ollama
-- `lecture-01/chapter-03/intro.md`: LangGraph
-- Each chapter's `section-01.md`: Hello World!!!
-- `lecture.md`, `chapter.md`: Generated decks that include child content
+There is one lecture: `lecture/` itself.
 
-Paths above are relative to `lectures/`. The [course outline](curriculum.md) is a planning document; detailed lesson content has not been populated.
+```text
+code/
+├── chapter-01/agent.py
+└── chapter-02/ ... chapter-08/
+lecture/
+├── intro.md
+├── chapter-01/section-01.md
+├── chapter-02/ ... chapter-08/
+├── lecture.md                 # Generated parent preview
+└── preview.sh
+```
+
+Edit Markdown in `lecture/` and Python in `code/`. A directive such as `<!-- code: @code/chapter-02/agent.py#call_model -->` includes the real function in the generated slide. Saving Python also refreshes the preview. Chapter 02 onward includes `changes.diff` for source comparison.
 
 ## Build and export
 

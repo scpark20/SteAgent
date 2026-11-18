@@ -1,0 +1,17 @@
+--- chapter-06/agent.py
++++ chapter-07/agent.py
+@@ -1,4 +1,4 @@
+-"""Chapter 06: let the model request one tool execution."""
++"""Chapter 07: feed tool results back to the model."""
+ 
+ import argparse
+ import json
+@@ -75,7 +75,7 @@
+     builder.add_node("tools", tool_node)
+     builder.add_edge(START, "assistant")
+     builder.add_conditional_edges("assistant", route, {"tools": "tools", END: END})
+-    builder.add_edge("tools", END)
++    builder.add_edge("tools", "assistant")
+     return builder.compile()
+ 
+ 
