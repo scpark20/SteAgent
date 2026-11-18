@@ -55,9 +55,15 @@ if ! ollama show "$model" >/dev/null 2>&1; then
   ollama pull "$model"
 fi
 
-if [[ ! -x tools/steslide/.tools/marp/marp ]]; then
+if [[ -z "${STESLIDE_MARP:-}" && ! -x tools/steslide/.tools/marp/marp ]] && ! command -v marp >/dev/null 2>&1; then
   uv run --locked python tools/steslide/scripts/setup_marp.py
 fi
+uv run --locked python - <<'PY'
+import runpy
+import subprocess
+tool = runpy.run_path("tools/steslide/steslide.py")
+subprocess.run([tool["marp_executable"](), "--version"], check=True)
+PY
 uv run --locked python tools/steslide/steslide.py build
 uv run --locked python -m unittest discover -s tests -v
 

@@ -16,6 +16,8 @@ Guide: [Mac local setup](mac-local-setup.md) · [PDF](mac-local-setup.pdf)
 6. Start `uv run python tools/steslide/steslide.py preview` in a persistent terminal. Open `http://localhost:8766/lecture.md` on the Mac. Use another port if occupied; do not stop unrelated processes. Verify edits to source Markdown or included Python refresh the preview, then undo any temporary probe.
 7. Report the local folder, chip/OS, test results, observed tool result, and preview URL. Separate verified results from any remaining limitations.
 
+For Intel Mac slide previews, install Node.js 18+ and run `npm install -g @marp-team/marp-cli@4.5.1` before setup. The standalone Mac Marp binary is Apple Silicon only. Setup accepts a global `marp` or `STESLIDE_MARP` and checks the selected executable. If an older checkout contains an incompatible bundled binary, set `STESLIDE_MARP` to the working global executable.
+
 ## Optional direct inference
 
 Chapter 01 uses `uv run --extra llm code/chapter-01/agent.py`. Its loader selects MPS and FP16 when available; `LLM_DEVICE=cpu` overrides this. The default model is `Qwen/Qwen3-4B-Instruct-2507`; the first run downloads separate Transformers weights. Allow memory beyond the approximately 8 GB of FP16 weights. Do not download or run this optional path without sufficient memory and the user's intended scope.
@@ -41,4 +43,4 @@ tools/steslide/.tools/marp/marp --no-config-file docs/mac-local-setup.md \
   --output docs/mac-local-setup.pdf
 ```
 
-The Linux authoring session may supply an explicit Linux browser path. Do not carry that override into the Mac commands.
+On Intel Macs, use `marp` in place of the bundled executable path. The Linux authoring session may supply an explicit Linux browser path. Do not carry that override into the Mac commands.

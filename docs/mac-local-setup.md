@@ -5,7 +5,7 @@ size: 16:9
 paginate: true
 footer: "STEAGENT · MAC LOCAL SETUP · 2026-11-18"
 style: |
-  section { --code-width: 1100px; font-size: 21px; }
+  section { --code-width: 1100px; font-size: 21px; font-variant-ligatures: none; }
   pre code { font-size: 19px; }
   h1 { font-size: 38px; }
   table { font-size: 18px; }
@@ -21,7 +21,7 @@ style: |
 | Agent · Chapters 02–08 | macOS 14+, uv, and a running Ollama service |
 | Hardware | Apple Silicon uses GPU acceleration; Intel uses CPU |
 | Direct weights · Chapter 01 | Apple Silicon for the locked macOS PyTorch packages |
-| Slides | SteSlide submodule; setup downloads the Mac Marp binary |
+| Slides | Apple Silicon: bundled Marp; Intel: Node.js + npm Marp |
 
 On Apple Silicon with a supported Homebrew installation, install the CLI tools:
 
@@ -31,6 +31,8 @@ brew services start ollama
 ```
 
 Alternatively, install [uv](https://docs.astral.sh/uv/getting-started/installation/) and the [Ollama Mac app](https://ollama.com/download/mac), then open Ollama. An existing Ollama app is sufficient; choose one installation route. If Git is missing, run `xcode-select --install` and finish Apple's dialog.
+
+For Intel Mac slides, install Node.js 18+ and run `npm install -g @marp-team/marp-cli@4.5.1` before setup.
 
 ---
 
@@ -113,7 +115,7 @@ LLM_DEVICE=cpu uv run --extra llm code/chapter-01/agent.py
 
 Open a Codex session with access to your **Mac's local filesystem**, then send:
 
-> Set up scpark20/SteAgent locally in ~/projects/steagent. Read AGENTS.md and docs/mac-handoff.md first. Preserve any existing checkout and edits. Install missing prerequisites, initialize the SteSlide submodule, and run scripts/setup_local.sh. Verify the final agent with --trace, open the local slide preview, and report the actual results. Check Apple GPU availability before trying the optional direct-weight chapter. Do not use the Linux server paths or its virtual environment.
+> Set up scpark20/SteAgent locally in `~/projects/steagent`. Read `AGENTS.md` and `docs/mac-handoff.md` first. Preserve any existing checkout and edits. Install missing prerequisites, initialize the SteSlide submodule, and run `scripts/setup_local.sh`. Verify the final agent with `--trace`, open the local slide preview, and report the actual results. Check Apple GPU availability before trying the optional direct-weight chapter. Do not use the Linux server paths or its virtual environment.
 
 | Symptom | Action |
 | --- | --- |
