@@ -2,17 +2,57 @@
 marp: true
 theme: steslide
 size: 16:9
-paginate: false
+paginate: true
+math: katex
 ---
 
-# Hello World!!!
+<!-- _class: annotated -->
+<!-- footer: "STEAGENT · 03 / LangGraph" -->
 
-Wrap the existing call in one graph node.
+<div class="eyebrow">03 / LangGraph</div>
 
-```bash
-uv run code/chapter-03/agent.py
+# Trace the state through one invocation
+
+<div class="split ">
+<div>
+
+<div class="code-meta">code/chapter-03/agent.py · State</div>
+
+<!-- code: @code/chapter-03/agent.py#State -->
+
+
+
+<div class="code-meta">code/chapter-03/agent.py · assistant</div>
+
+<!-- code: @code/chapter-03/agent.py#assistant -->
+
+
+
+```python
+state = graph.invoke({"messages": messages})
 ```
 
-Expected greeting: **Hello World!!!**
+</div>
+<div>
 
-Source: `code/chapter-03/agent.py`
+| Moment | Message list |
+|---|---|
+| Input | `[user]` |
+| Node reads | `[user]` |
+| Node returns | `[user, assistant]` |
+| Caller receives | Updated state dictionary |
+
+
+
+<div class="note">The node returns the <b>whole new list</b>. No append reducer is configured; the state key uses replacement semantics.</div>
+
+
+
+<div class="small">
+
+`TypedDict` documents the shape for type checking. It does not validate the contents at runtime.
+
+</div>
+
+</div>
+</div>

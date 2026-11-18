@@ -1,6 +1,6 @@
 --- chapter-01/agent.py
 +++ chapter-02/agent.py
-@@ -1,39 +1,25 @@
+@@ -1,44 +1,30 @@
 -"""Chapter 01: call pretrained model weights directly."""
 +"""Chapter 02: replace direct inference with an Ollama HTTP request."""
  
@@ -55,3 +55,9 @@
  
  
  def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
++    parser.add_argument("prompt", nargs="?", default="What is 2 + 3? Reply with only the number.")
+     args = parser.parse_args()
+     messages = [{"role": "user", "content": args.prompt}]
+     reply = call_model(messages)

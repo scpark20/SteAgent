@@ -1,26 +1,25 @@
-# Course: a minimal agent through small changes
+# From inference to a minimal agent
 
 [← SteAgent](../README.md) · [Run the examples](usage.md) · [Slides](slides.md)
 
-Each chapter has executable code in `code/chapter-*/agent.py` and separate slides in `lecture/chapter-*/section-*.md`. Every chapter starts with Hello World!!! and explains the actual source. Chapter 02 onward also has a `changes.diff` against the previous implementation. The slide generator reads code excerpts from the actual source files.
+One evolving Python program, eight executable checkpoints, and a 19-slide lecture. Code lives in `code/chapter-*/agent.py`; explanations live separately in `lecture/chapter-*/`. Slides include excerpts from the actual source. Chapters 02–08 include a `changes.diff` against the preceding checkpoint.
 
-| Chapter | Opening | Subsequent sections | Change from the previous code |
-| --- | --- | --- | --- |
-| [01 · LLM](../code/chapter-01/) | Hello World!!! | Loading weights; templates; token generation | Establish `call_model(messages)` and a small CLI. |
-| [02 · Ollama](../code/chapter-02/) | Hello World!!! | HTTP model call; unchanged caller | Replace direct inference with `/api/chat`. |
-| [03 · LangGraph](../code/chapter-03/) | Hello World!!! | State; assistant node; graph edges | Wrap the same adapter in START → assistant → END. |
-| [04 · State & Memory](../code/chapter-04/) | Hello World!!! | Message history; interactive turns | Keep graph code; retain messages between invocations. |
-| [05 · Tools](../code/chapter-05/) | Hello World!!! | Function; schema; registry; dispatch | Add one explicit Python action without changing inference. |
-| [06 · Tool Calling](../code/chapter-06/) | Hello World!!! | Model action requests; routing; execution | Send the tool schema and execute a requested call once. |
-| [07 · Agent Loop](../code/chapter-07/) | Hello World!!! | Result feedback; repeated decisions | Change the tools edge from END to assistant. |
-| [08 · Minimal Agent](../code/chapter-08/) | Hello World!!! | Input validation; tool errors; limits; demonstration | Preserve the loop and add predictable failure behavior. |
+| Chapter | Demonstration | Change from the previous code | Slides |
+| --- | --- | --- | ---: |
+| [01 · LLM](../code/chapter-01/) | The first Hello World!!! | Load pretrained weights; tokenize, generate, and decode behind `call_model(messages)`. | 3 |
+| [02 · Ollama](../code/chapter-02/) | Answer a question through HTTP | Replace local inference with `/api/chat`; keep the caller and return shape. | 2 |
+| [03 · LangGraph](../code/chapter-03/) | Trace one state update through a graph | Add state, an assistant node, and START → assistant → END. | 2 |
+| [04 · State & Memory](../code/chapter-04/) | Recall a name across turns | Retain the message list between invocations. | 1 |
+| [05 · Tools](../code/chapter-05/) | Execute `add(2, 3)` explicitly | Add a function, schema, registry, and executor. | 2 |
+| [06 · Tool Calling](../code/chapter-06/) | Let the model request `add(12, 30)` | Attach the schema, route a tool request, and execute once. | 2 |
+| [07 · Agent Loop](../code/chapter-07/) | Answer using the observed result | Change one edge: tools → END becomes tools → assistant. | 2 |
+| [08 · Minimal Agent](../code/chapter-08/) | Validate requests, handle failures, and stop | Add argument checks, error observations, and a model-call budget. | 4 |
 
-## How to teach each checkpoint
+The opening slide shows the destination; the 18 chapter slides explain how to build it. Chapter lengths follow the amount of new behavior, rather than repeating a fixed format.
 
-1. Run the Hello World!!! example.
-2. Compare the source with the previous chapter.
-3. Explain the changed function and its state/input/output.
-4. Run the new behavior, then verify that the old greeting still works.
+## Teaching progression
+
+Start from something the learner can execute, inspect the changed code, and trace its inputs, state changes, and outputs. Keep the explanation and relevant code together. Use a new demonstration when a chapter adds a capability; do not repeat a greeting as every chapter's introduction.
 
 Compare adjacent checkpoints directly:
 
@@ -28,4 +27,6 @@ Compare adjacent checkpoints directly:
 git diff --no-index code/chapter-06/agent.py code/chapter-07/agent.py
 ```
 
-The final demonstration answers a greeting, chooses the addition tool when needed, observes the real result, and stops predictably on errors or limits. This course builds agent control flow from pretrained model weights; it does not train a language model from scratch.
+The final agent selects a tool, executes it in Python, feeds the observation back to the model, and stops explicitly at its call budget. This course builds agent control flow from pretrained weights; it does not train a language model from scratch.
+
+See [teaching notes and reference courses](teaching-notes.md) for the design rationale and reviewed material.

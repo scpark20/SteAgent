@@ -79,7 +79,7 @@
      builder.add_node("assistant", assistant)
 @@ -83,19 +108,31 @@
      parser = argparse.ArgumentParser(description=__doc__)
-     parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+     parser.add_argument("prompt", nargs="?", default="Use add to calculate 12 + 30.")
      parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
 -    parser.add_argument("--tool-demo", action="store_true", help="Execute add(2, 3) directly")
 +    parser.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "qwen3:4b-instruct"))

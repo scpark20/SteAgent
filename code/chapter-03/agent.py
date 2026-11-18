@@ -43,7 +43,7 @@ def build_graph():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+    parser.add_argument("prompt", nargs="?", default="What is 2 + 3? Reply with only the number.")
     args = parser.parse_args()
     messages = [{"role": "user", "content": args.prompt}]
     graph = build_graph()

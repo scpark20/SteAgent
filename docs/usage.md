@@ -45,7 +45,7 @@ uv run code/chapter-07/agent.py "Use add to calculate 12 + 30."
 uv run code/chapter-08/agent.py "Use add to calculate 12 + 30." --trace
 ```
 
-All scripts accept a positional prompt and default to a Hello World!!! request. Chapters 04–08 accept `--chat`. Chapter 05 demonstrates direct dispatch; Chapter 06 ends at the tool result; Chapter 07 returns that result to the model.
+All scripts accept a positional prompt. Chapter 01 defaults to Hello World!!!; Chapters 02, 03, and 05 ask a short arithmetic question; Chapter 04 introduces the name Ada; Chapters 06–08 request the addition tool. Chapters 04–08 accept `--chat`. In Chapter 04, ask “What is my name?” at the next prompt. Chapter 05 demonstrates direct dispatch with `--tool-demo`; Chapter 06 ends at the tool result; Chapter 07 returns that result to the model.
 
 Use `OLLAMA_MODEL` and `OLLAMA_BASE_URL` to configure Chapters 02–08. Defaults are `qwen3:4b-instruct` and `http://localhost:11434`.
 

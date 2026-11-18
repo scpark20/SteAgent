@@ -40,9 +40,12 @@
  def build_graph():
      def assistant(state):
          reply = call_model(state["messages"])
-@@ -45,7 +72,12 @@
+@@ -43,9 +70,14 @@
+ 
+ def main():
      parser = argparse.ArgumentParser(description=__doc__)
-     parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+-    parser.add_argument("prompt", nargs="?", default="My name is Ada.")
++    parser.add_argument("prompt", nargs="?", default="What is 2 + 3? Reply with only the number.")
      parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
 +    parser.add_argument("--tool-demo", action="store_true", help="Execute add(2, 3) directly")
      args = parser.parse_args()

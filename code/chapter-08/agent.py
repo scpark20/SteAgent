@@ -106,7 +106,7 @@ def build_graph(max_steps=8):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+    parser.add_argument("prompt", nargs="?", default="Use add to calculate 12 + 30.")
     parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
     parser.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "qwen3:4b-instruct"))
     parser.add_argument("--base-url", default=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"))

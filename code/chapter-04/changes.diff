@@ -6,10 +6,12 @@
  
  import argparse
  import json
-@@ -44,11 +44,24 @@
+@@ -43,12 +43,25 @@
+ 
  def main():
      parser = argparse.ArgumentParser(description=__doc__)
-     parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+-    parser.add_argument("prompt", nargs="?", default="What is 2 + 3? Reply with only the number.")
++    parser.add_argument("prompt", nargs="?", default="My name is Ada.")
 +    parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
      args = parser.parse_args()
 -    messages = [{"role": "user", "content": args.prompt}]

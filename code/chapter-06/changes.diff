@@ -24,7 +24,7 @@
      url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/") + "/api/chat"
      request = urllib.request.Request(
          url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"}
-@@ -58,13 +60,22 @@
+@@ -58,19 +60,28 @@
  
  def build_graph():
      def assistant(state):
@@ -49,3 +49,10 @@
      return builder.compile()
  
  
+ def main():
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("prompt", nargs="?", default="What is 2 + 3? Reply with only the number.")
++    parser.add_argument("prompt", nargs="?", default="Use add to calculate 12 + 30.")
+     parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
+     parser.add_argument("--tool-demo", action="store_true", help="Execute add(2, 3) directly")
+     args = parser.parse_args()

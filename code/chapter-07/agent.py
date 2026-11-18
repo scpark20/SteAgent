@@ -81,7 +81,7 @@ def build_graph():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+    parser.add_argument("prompt", nargs="?", default="Use add to calculate 12 + 30.")
     parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
     parser.add_argument("--tool-demo", action="store_true", help="Execute add(2, 3) directly")
     args = parser.parse_args()

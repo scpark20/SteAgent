@@ -58,3 +58,9 @@ git push
 ```
 
 Edit shared generators and themes inside `tools/steslide`, commit and push to **SteSlide first**, then record the updated submodule commit in SteAgent. See the [SteSlide usage guide](https://github.com/scpark20/SteSlide/blob/main/docs/usage.md) and [maintenance guide](https://github.com/scpark20/SteSlide/blob/main/docs/maintenance.md). Restart the preview after Python tooling updates.
+
+## Compact annotated slides
+
+The 19-slide deck combines runnable examples, code annotations, tables, equations, and editable SVG diagrams. Chapters use between one and four slides according to their content. Only the first direct-inference example uses Hello World!!!; later examples demonstrate the new capability. See [teaching notes](teaching-notes.md).
+
+For a focused excerpt, use `<!-- code: @code/chapter-04/agent.py#main[7:15] -->`. The inclusive range is relative to the function, starting at its definition. Update the range if the function changes; an out-of-bounds selection fails the build.

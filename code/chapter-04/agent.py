@@ -43,7 +43,7 @@ def build_graph():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("prompt", nargs="?", default="Say exactly: Hello World!!!")
+    parser.add_argument("prompt", nargs="?", default="My name is Ada.")
     parser.add_argument("--chat", action="store_true", help="Keep messages between turns")
     args = parser.parse_args()
     graph = build_graph()

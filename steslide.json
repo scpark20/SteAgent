@@ -2,7 +2,7 @@
   "lectures": "lecture",
   "theme": "steslide",
   "size": "16:9",
-  "paginate": false,
+  "paginate": true,
   "math": "katex",
   "code": "code"
 }

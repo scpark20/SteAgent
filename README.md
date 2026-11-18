@@ -45,7 +45,7 @@ The wording of the final model response can vary. The tool result is computed by
 
 ## Eight runnable chapters
 
-Each chapter starts with **Hello World!!!**, explains the actual source code, and records the changes from the previous checkpoint.
+Start with **Hello World!!!** from pretrained weights, then add HTTP inference, state, tool execution, and feedback. Each checkpoint explains its actual source and records the changes from the previous one.
 
 | Chapter | Runnable code | What changes |
 | --- | --- | --- |
@@ -78,7 +78,7 @@ python3 tools/steslide/scripts/setup_marp.py
 bash lecture/preview.sh
 ```
 
-Open **[localhost:8766/lecture.md](http://localhost:8766/lecture.md)**. Each section includes runnable commands, source code, and an explanation. Code excerpts are extracted directly from the Python files and update when those files change.
+Open **[localhost:8766/lecture.md](http://localhost:8766/lecture.md)**. The 19-slide lecture places source code beside explanations, execution diagrams, tables, and equations. Code excerpts are extracted directly from the Python files and update when those files change.
 
 ## Documentation
 

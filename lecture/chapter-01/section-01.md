@@ -2,19 +2,50 @@
 marp: true
 theme: steslide
 size: 16:9
-paginate: false
+paginate: true
+math: katex
 ---
 
-# Hello World!!!
+<!-- _class: annotated -->
+<!-- footer: "STEAGENT · 01 / LLM" -->
 
-Load model weights and a tokenizer directly.
+<div class="eyebrow">01 / LLM</div>
 
-```bash
-uv run --extra llm code/chapter-01/agent.py
-```
+# Generate tokens, then decode the new suffix
 
-Expected greeting: **Hello World!!!**
+<div class="split code-layout">
+<div>
 
-Source: `code/chapter-01/agent.py`
+<div class="code-meta">code/chapter-01/agent.py · call_model</div>
 
-Set `LLM_MODEL` to a local checkpoint or Hugging Face model ID.
+<!-- code: @code/chapter-01/agent.py#call_model -->
+
+</div>
+<div>
+
+<div class="small">
+
+1. Reuse the cached model and tokenizer.
+2. Apply role markers with the chat template.
+3. Convert text to tensors on the model device.
+4. Generate without gradient bookkeeping.
+5. Decode only tokens after the input prefix.
+
+</div>
+
+<div class="formula">
+
+$$p_\theta(y\mid x)=\prod_t p_\theta(y_t\mid x,y_{<t})$$
+
+</div>
+
+
+
+<div class="small">
+
+`do_sample=False` chooses the highest-scoring token at each step. `max_new_tokens=128` is a cap, not a required length. An end token can stop generation earlier.
+
+</div>
+
+</div>
+</div>
