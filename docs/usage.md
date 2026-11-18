@@ -4,6 +4,8 @@
 
 ## Setup
 
+For a Mac-local checkout, use the [setup guide](mac-local-setup.md) or its [PDF](mac-local-setup.pdf). After installing uv and Ollama, `bash scripts/setup_local.sh` prepares dependencies, the model, the slide tool, and the tests.
+
 ```bash
 git clone --recurse-submodules https://github.com/scpark20/SteAgent.git
 cd SteAgent
@@ -31,7 +33,9 @@ Set `LLM_MODEL` to a Hugging Face model ID or local directory:
 LLM_MODEL=/path/to/qwen-checkpoint uv run --extra llm code/chapter-01/agent.py
 ```
 
-The default is `Qwen/Qwen3-4B-Instruct-2507`. PyTorch, Transformers, and Accelerate are optional dependencies. The first run may download the selected model. A CUDA-capable PyTorch installation and sufficient GPU memory are recommended. FP8 checkpoints are dequantized on load, so allow memory for the expanded weights. The local Qwen3-8B-FP8 checkpoint has been verified on an RTX 5090.
+The default is `Qwen/Qwen3-4B-Instruct-2507`. PyTorch, Transformers, and Accelerate are optional dependencies. The first run may download the selected model. On Apple Silicon, an available MPS backend is selected with FP16; other hosts keep automatic device placement. Set `LLM_DEVICE=cpu` to force CPU execution. The locked PyTorch macOS wheels require Apple Silicon; Intel Macs can run the Ollama chapters.
+
+Allow memory for the weights and runtime buffers. FP8 checkpoints are dequantized on load. The local Qwen3-8B-FP8 checkpoint has been verified on an RTX 5090; Apple GPU inference has not yet been verified on a real Mac.
 
 ## Chapter checkpoints
 

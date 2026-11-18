@@ -15,6 +15,7 @@
 
 <p align="center">
   <a href="docs/usage.md">Getting started</a> ·
+  <a href="docs/mac-local-setup.pdf">Mac setup PDF</a> ·
   <a href="docs/curriculum.md">Course outline</a> ·
   <a href="docs/architecture.md">Architecture</a> ·
   <a href="docs/slides.md">Slides</a>
@@ -42,6 +43,20 @@ Requires **Python 3.11+, [uv](https://docs.astral.sh/uv/), and a running [Ollama
 ```
 
 The wording of the final model response can vary. The tool result is computed by Python.
+
+## Run locally on a Mac
+
+Install uv and Ollama, clone with submodules, then run:
+
+```bash
+bash scripts/setup_local.sh
+uv run agent.py --trace
+uv run python tools/steslide/steslide.py preview
+```
+
+The setup script prepares the model, Python environment, and slides. Apple Silicon uses Ollama's GPU acceleration; Intel Macs use CPU inference. The optional direct-weight chapter selects Apple's MPS backend when available.
+
+Follow the [Mac setup guide](docs/mac-local-setup.md), download the [PDF](docs/mac-local-setup.pdf), or give the [handoff instructions](docs/mac-handoff.md) to a Codex session on your Mac. Hardware execution on macOS is still to be verified in that session.
 
 ## Eight runnable chapters
 

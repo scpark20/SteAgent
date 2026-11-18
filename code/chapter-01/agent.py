@@ -10,7 +10,10 @@ from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, FineGr
 def load_model():
     name = os.getenv("LLM_MODEL", "Qwen/Qwen3-4B-Instruct-2507")
     config = AutoConfig.from_pretrained(name)
-    options = {"device_map": "auto", "dtype": "auto"}
+    device = os.getenv("LLM_DEVICE", "auto")
+    if device == "auto" and torch.backends.mps.is_available():
+        device = "mps"
+    options = {"device_map": device, "dtype": torch.float16 if device == "mps" else "auto"}
     if getattr(config, "quantization_config", {}).get("quant_method") == "fp8":
         options["quantization_config"] = FineGrainedFP8Config(dequantize=True)
     tokenizer = AutoTokenizer.from_pretrained(name)

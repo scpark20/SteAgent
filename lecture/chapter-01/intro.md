@@ -31,7 +31,7 @@ math: katex
 - **Tokenizer:** vocabulary and formatting.
 - **Model:** pretrained parameters on available devices.
 
-`dtype="auto"` follows checkpoint precision. FP8 is dequantized here and needs extra memory.
+Apple Silicon uses MPS with FP16. Other devices follow checkpoint precision. FP8 checkpoints are dequantized.
 
 `eval()` selects inference behavior.
 
